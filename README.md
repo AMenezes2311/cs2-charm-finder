@@ -1,36 +1,75 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Charm Scraper
 
-## Getting Started
+Scrape CS2 tournament charm listings from csgoskins.gg, enrich them with Steam Market links, and explore them with filtering, sorting, and CSV export.
 
-First, run the development server:
+## Features
+
+- Scrape any csgoskins.gg charm listing page server-side (POST `/api/scrape`).
+- Deduplicates results and extracts title, price, rarity, popularity, rating, images, and Steam Market URLs.
+- Client-side filtering, sort by price/title, and CSV export of the current view.
+- Built with Next.js App Router (Node runtime) and Tailwind UI components.
+
+## Prerequisites
+
+- Node.js 20+ recommended (Next 15).
+- npm (ships with Node). No extra environment variables are required.
+
+## Setup
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+# visit http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Usage
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. Start the dev server and open the app.
+2. Enter a player name (input builds the tournament charm URL under the hood) or paste any csgoskins.gg charm page URL.
+3. Click "Fetch charms" to scrape; refine results via the filter box, sort toggles, or export the current view to CSV.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## API
 
-## Learn More
+- Endpoint: `POST /api/scrape`
+- Body: `{ "url": "https://csgoskins.gg/..." }` (must be a csgoskins.gg URL)
+- Response shape:
 
-To learn more about Next.js, take a look at the following resources:
+```json
+{
+  "count": 24,
+  "steam": "https://steamcommunity.com/market/listings/730/...",
+  "items": [
+    {
+      "title": "Souvenir Charm | ...",
+      "href": "https://csgoskins.gg/items/charm-...",
+      "image": "https://...",
+      "price": 12.34,
+      "priceText": "$12.34",
+      "rarity": "Classified",
+      "popularity": "Top 10%",
+      "rating": "4.8",
+      "steam": "https://steamcommunity.com/market/listings/730/..."
+    }
+  ]
+}
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Project Structure
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- app/page.tsx — UI for querying, filtering, sorting, and exporting results.
+- app/api/scrape/route.ts — server-side scraping with cheerio and Steam URL generation.
+- components/ui/\* — shared button, card, input, table primitives.
+- lib/utils.ts — shared utilities for classnames.
 
-## Deploy on Vercel
+## Scripts
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- `npm run dev` — start Next.js with Turbopack.
+- `npm run build` — production build.
+- `npm run start` — serve the production build.
+- `npm run lint` — run eslint.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Notes
+
+- Scraping is restricted to csgoskins.gg for safety; other hosts return 400.
+- Requests bypass Next.js caching (`cache: "no-store"`), so each call hits the origin.
+- For deployment, add a production host (e.g., Vercel) and ensure outbound HTTP access is allowed.

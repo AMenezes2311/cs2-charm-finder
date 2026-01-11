@@ -4,6 +4,7 @@
 /node_modules
 /.pnp
 .pnp.*
+.turbo
 .yarn/*
 !.yarn/patches
 !.yarn/plugins
@@ -20,9 +21,16 @@
 # production
 /build
 
+# lint/cache
+.eslintcache
+
 # misc
 .DS_Store
+.idea/
+.vscode/
+*.code-workspace
 *.pem
+*.log
 
 # debug
 npm-debug.log*
